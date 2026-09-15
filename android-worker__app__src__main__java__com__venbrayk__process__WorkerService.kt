@@ -3,7 +3,6 @@ package com.venbrayk.process
 import android.app.*
 import android.content.Intent
 import android.os.IBinder
-import androidx.core.app.NotificationCompat
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -67,8 +66,13 @@ class WorkerService : Service() {
 
     private fun error(code: String) = JSONObject().put("type", "error").put("code", code)
     private fun update(text: String) = getSystemService(NotificationManager::class.java).notify(1001, notification(text))
-    private fun notification(text: String) = NotificationCompat.Builder(this, "vbp_session").setContentTitle("Venbrayk Process App").setContentText(text).setSmallIcon(android.R.drawable.ic_dialog_info).setOngoing(true).build()
-    private fun createChannel() = getSystemService(NotificationManager::class.java).createNotificationChannel(NotificationChannel("vbp_session", "Sessão de processamento", NotificationManager.IMPORTANCE_DEFAULT))
+    private fun notification(text: String) = Notification.Builder(this, "vbp_session")
+        .setContentTitle("Venbrayk Process App")
+        .setContentText(text)
+        .setSmallIcon(R.drawable.ic_notification)
+        .setOngoing(true)
+        .build()
+    private fun createChannel() = getSystemService(NotificationManager::class.java).createNotificationChannel(NotificationChannel("vbp_session", "Sessão de processamento", NotificationManager.IMPORTANCE_LOW))
     override fun onDestroy() { running = false; server?.close(); super.onDestroy() }
     override fun onBind(intent: Intent?): IBinder? = null
 }
