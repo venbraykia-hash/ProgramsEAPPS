@@ -1,0 +1,75 @@
+name: Gerar APK e EXE
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconstruir pastas
+        shell: bash
+        run: |
+          mkdir project
+          for file in *__*; do
+            destination="${file//__//}"
+            mkdir -p "project/$(dirname "$destination")"
+            cp "$file" "project/$destination"
+          done
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Compilar APK
+        run: gradle -p project/android-worker assembleDebug --stacktrace
+
+      - name: Preparar APK
+        run: cp project/android-worker/app/build/outputs/apk/debug/app-debug.apk Venbrayk-Process-App-v0.1.0.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Venbrayk-Process-Android
+          path: Venbrayk-Process-App-v0.1.0.apk
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconstruir pastas
+        shell: bash
+        run: |
+          mkdir project
+          for file in *__*; do
+            destination="${file//__//}"
+            mkdir -p "project/$(dirname "$destination")"
+            cp "$file" "project/$destination"
+          done
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Compilar programa
+        run: dotnet publish project/windows-controller/Venbrayk.Process.Controller.csproj -c Release -o project/publish
+
+      - name: Instalar compilador
+        run: choco install innosetup -y
+
+      - name: Criar instalador
+        run: iscc project/installer/VenbraykProcess.iss
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Venbrayk-Process-Windows
+          path: project/artifacts/Venbrayk-Process-Setup-v0.1.0.exe
