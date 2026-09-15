@@ -67,7 +67,7 @@ class WorkerService : Service() {
     private fun error(code: String) = JSONObject().put("type", "error").put("code", code)
     private fun update(text: String) = getSystemService(NotificationManager::class.java).notify(1001, notification(text))
     private fun notification(text: String) = Notification.Builder(this, "vbp_session").setContentTitle("Venbrayk Process App").setContentText(text).setSmallIcon(android.R.drawable.stat_sys_data_usb).setOngoing(true).build()
-    private fun createChannel() = getSystemService(NotificationManager::class.java).createNotificationChannel(NotificationChannel("vbp_session", "Sessão de processamento", NotificationManager.IMPORTANCE_LOW))
+    private fun createChannel() = getSystemService(NotificationManager::class.java).createNotificationChannel(NotificationChannel("vbp_session", "Sessão de processamento", NotificationManager.IMPORTANCE_DEFAULT))
     override fun onDestroy() { running = false; server?.close(); super.onDestroy() }
     override fun onBind(intent: Intent?): IBinder? = null
 }
