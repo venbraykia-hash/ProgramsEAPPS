@@ -71,4 +71,3 @@ class WorkerService : Service() {
     override fun onDestroy() { running = false; server?.close(); super.onDestroy() }
     override fun onBind(intent: Intent?): IBinder? = null
 }
-
